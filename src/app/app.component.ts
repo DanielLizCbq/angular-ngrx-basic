@@ -3,14 +3,15 @@ import { Observable } from 'rxjs';
 
 import { Person } from './person';
 import * as faker from 'faker';
-import { Store, select } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import {
   PersonNew,
   PersonAll,
   PersonUpdate,
   PersonDelete,
 } from './store/person.actions';
-import { AppState, selectPeople } from './store';
+import { AppState } from './store';
+import * as fromPersonSelectors from './store/person.selector';
 
 @Component({
   selector: 'app-root',
@@ -25,8 +26,9 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.store.dispatch(new PersonAll());
     // this.people$ = this.store.pipe(select('people'));
-    this.people$ = this.store.select(selectPeople);
+    // this.people$ = this.store.select(selectPeople);
     // this.store.select(selectPeopleCount).subscribe((n) => console.log(n));
+    this.people$ = this.store.select(fromPersonSelectors.selectAll);
   }
 
   addNew(): void {
@@ -53,6 +55,8 @@ export class AppComponent implements OnInit {
       country: faker.address.country(),
       age: Math.round(Math.random() * 100),
     };
-    this.store.dispatch(new PersonUpdate({ person: { ...p, ...person } }));
+    this.store.dispatch(
+      new PersonUpdate({ id: p._id, changes: { ...p, ...person } })
+    );
   }
 }
